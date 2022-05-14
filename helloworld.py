@@ -1,81 +1,74 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
 import altair as alt
+import numpy as np
 
 with st.echo(code_location='below'):
-    """
-    ## Hello, World!
-    """
-
-
-    def print_hello(name="World"):
-        st.write(f"### Hello, {name}!")
-
-
-    name = st.text_input("Your name", key="name", value="Anonymous")
-    print_hello(name)
-
-    """
-    ## Добавим графики
-    Чтобы заработали библиотеки seaborn и altair, нужно добавить в проект файл 
-    `requirements.txt` с такими строчками:
-    
-        seaborn
-        altair
-    """
-
-
-    a = st.slider("a")
-    x = np.linspace(-6, 6, 500)
-    df = pd.DataFrame(dict(x=x, y=np.sin(a * x)))
-    fig, ax = plt.subplots()
-    sns.lineplot(data=df, x="x", y="y", ax=ax)
-    st.pyplot(fig)
-
-    """
-    ## Немного анализа данных
-    """
-
-
-    @st.cache
-    def get_data():
-        data_url = (
-            "https://github.com/Godoy/imdb-5000-movie-dataset/raw/"
-            "master/data/movie_metadata.csv"
-        )
-        return (
-            pd.read_csv(data_url)
-            .dropna(subset=["title_year"])
-            .assign(
-                title_year=lambda x: pd.to_datetime(
-                    x["title_year"], format="%Y"
-                )
-            )
-        )
-
-
-    df = get_data()
-
-    director = st.selectbox(
-        "Director", df["director_name"].value_counts().iloc[:10].index
-    )
-
-    df_selection = df[lambda x: x["director_name"] == director]
-    df_selection
-
-    chart = (
-        alt.Chart(df_selection)
-        .mark_circle()
-        .encode(x=alt.X("title_year:T"), y="imdb_score", tooltip="movie_title")
-    )
-
-    st.altair_chart(
-        (
-            chart
-            + chart.transform_loess("title_year", "imdb_score").mark_line()
-        ).interactive()
-        # .transform_loess добавляет сглаживающую кривую
-    )
+    election = open(r'D:\Miron\voting_data_eng.csv')
+    election_csv = pd.read_csv(election)
+    el2 = election_csv.assign(Turnout=lambda x: x.Number_of_valid_ballot_papers / x.Number_of_voters_enlisted * 100)
+    el3 = el2.assign(Percentage_for_Putin=
+                     lambda x: x.Putin_Vladimir_Vladimirovich / x.Number_of_valid_ballot_papers * 100)
+    rg = el3['region_name']
+    regions = rg.drop_duplicates()
+    regions.iloc[0] = 'All regions'
+    st.title('Визуализация аномалий на президентских выборах в России 2018')
+    st.write('Данный генератор гистограмм и диаграмм рассеивания позволяет увидеть статистические аномалии на '
+             'президентских выборах 2018. Существуют '
+             '[исследования](https://link.springer.com/article/10.1140/epjb/e2010-00151-1) о том, '
+             'что результаты выборов, в частности явка и процент голосов, распределяются в примерном соответствии с '
+             'гауссовым распределением. Другой показатель аномалий - увеличение процента голосов за победителя с '
+             'увеличением явки, что с большой вероятностью свидетельствует о вбросах. Единого мнения по поводу '
+             'существования значительных фальсификаций на этих выборах не сложилось, подробности и разные мнения можно '
+             'почитать, например, [здесь](https://meduza.io/feature/2018/07/03/tak-skolko-golosov-ukrali-na-prezidentskih-vyborah-sotni-tysyach-ili-milliony).')
+    region = st.selectbox('Выберите регион', regions)
+    plottype = st.radio('Выберите тип диаграммы', ['Распределение явки', 'Распределение голосов за В.В.Путина',
+                                          'Scatter-plot со значениями явки и процента голосов за В.В.Путина',
+                                                   'Таблица с результатами'])
+    color = st.color_picker(label='Выберите цвет', value='#8B0000')
+    if region == 'All regions':
+        regresult = el3
+    else:
+        regresult = el3[el3['region_name'] == region]
+    def gaussian(x, a, b, c):
+        return a*np.exp(-np.power(x - b, 2)/(2*np.power(c, 2)))
+    def power_law(x, a, b):
+        return a*np.power(x, b)
+    if plottype == 'Распределение явки':
+        bandwidth = st.slider(label='Выберите ширину столбца для вычисления плотности', min_value=0.1, max_value=5.0)
+        d = alt.Chart(regresult).transform_density('Turnout', as_=['Turnout', 'density'],
+                                                   bandwidth=bandwidth).mark_area(color=color).encode(
+            x=alt.X("Turnout:Q", axis=alt.Axis(title='Процент явки')),
+            y=alt.Y('density:Q', axis=alt.Axis(title='Плотность распределения')))
+        st.altair_chart(d, use_container_width=True)
+    #    pars, cov = curve_fit(f=gaussian, xdata=regresult[''], ydata=, p0=[0, 0, 0], bounds=(-np.inf, np.inf))
+    #    stdevs = np.sqrt(np.diag(cov))
+    #    res = y_dummy - power_law(x_dummy, *pars)
+    #    ax.plot(x_dummy, gaussian(x_dummy, *pars), linestyle='--', linewidth=2, color='black')
+    if plottype == 'Распределение голосов за В.В.Путина':
+        bandwidth = st.slider(label='Выберите ширину столбца для вычисления плотности', min_value=0.1, max_value=5.0)
+        d = alt.Chart(regresult).transform_density('Percentage_for_Putin', as_=['Percentage_for_Putin', 'density'],
+                                                   bandwidth=bandwidth).mark_area(color=color).encode(
+            x=alt.X("Percentage_for_Putin:Q", axis=alt.Axis(title='Процент голосов за Путина')),
+            y=alt.Y('density:Q', axis=alt.Axis(title='Плотность распределения')))
+        st.altair_chart(d, use_container_width=True)
+    #    x_dummy = np.linspace(start=-10, stop=10, num=100)
+    #    y_dummy = gaussian(x_dummy, 8, -1, 3)
+    #    noise = 0.5 * np.random.normal(size=y_dummy.size)
+    #    y_dummy = y_dummy + noise
+    #    pars, cov = curve_fit(f=gaussian, xdata=x_dummy, ydata=y_dummy, p0=[0, 0, 0], bounds=(-np.inf, np.inf))
+    #    stdevs = np.sqrt(np.diag(cov))
+    #    res = y_dummy - power_law(x_dummy, *pars)
+    #    ax.plot(x_dummy, gaussian(x_dummy, *pars), linestyle='--', linewidth=2, color='black')
+    if plottype == 'Scatter-plot со значениями явки и процента голосов за В.В.Путина':
+        c = alt.Chart(regresult).mark_circle(size=1, color=color).encode(
+            x=alt.X('Turnout', axis=alt.Axis(title='Явка (%)')), y=alt.Y('Percentage_for_Putin',
+                                                                         axis=alt.Axis(
+                                                                             title='Путин (%)'))).configure_mark(
+            opacity=0.2)
+        st.altair_chart(c, use_container_width=True)
+    if plottype == 'Таблица с результатами':
+        regresult.rename(columns={'ps_id': 'Номер УИК', 'Turnout': 'Явка (%)', 'Percentage_for_Putin':
+            'Процент голосов за Путина'},
+                         inplace=True)
+        st.write(regresult[['Номер УИК', 'Явка (%)', 'Процент голосов за Путина']])
