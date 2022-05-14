@@ -41,10 +41,6 @@ with st.echo(code_location='below'):
             x=alt.X("Turnout:Q", axis=alt.Axis(title='Процент явки')),
             y=alt.Y('density:Q', axis=alt.Axis(title='Плотность распределения')))
         st.altair_chart(d, use_container_width=True)
-    #    pars, cov = curve_fit(f=gaussian, xdata=regresult[''], ydata=, p0=[0, 0, 0], bounds=(-np.inf, np.inf))
-    #    stdevs = np.sqrt(np.diag(cov))
-    #    res = y_dummy - power_law(x_dummy, *pars)
-    #    ax.plot(x_dummy, gaussian(x_dummy, *pars), linestyle='--', linewidth=2, color='black')
     if plottype == 'Распределение голосов за В.В.Путина':
         bandwidth = st.slider(label='Выберите ширину столбца для вычисления плотности', min_value=0.1, max_value=5.0)
         d = alt.Chart(regresult).transform_density('Percentage_for_Putin', as_=['Percentage_for_Putin', 'density'],
@@ -52,14 +48,6 @@ with st.echo(code_location='below'):
             x=alt.X("Percentage_for_Putin:Q", axis=alt.Axis(title='Процент голосов за Путина')),
             y=alt.Y('density:Q', axis=alt.Axis(title='Плотность распределения')))
         st.altair_chart(d, use_container_width=True)
-    #    x_dummy = np.linspace(start=-10, stop=10, num=100)
-    #    y_dummy = gaussian(x_dummy, 8, -1, 3)
-    #    noise = 0.5 * np.random.normal(size=y_dummy.size)
-    #    y_dummy = y_dummy + noise
-    #    pars, cov = curve_fit(f=gaussian, xdata=x_dummy, ydata=y_dummy, p0=[0, 0, 0], bounds=(-np.inf, np.inf))
-    #    stdevs = np.sqrt(np.diag(cov))
-    #    res = y_dummy - power_law(x_dummy, *pars)
-    #    ax.plot(x_dummy, gaussian(x_dummy, *pars), linestyle='--', linewidth=2, color='black')
     if plottype == 'Scatter-plot со значениями явки и процента голосов за В.В.Путина':
         c = alt.Chart(regresult).mark_circle(size=1, color=color).encode(
             x=alt.X('Turnout', axis=alt.Axis(title='Явка (%)')), y=alt.Y('Percentage_for_Putin',
