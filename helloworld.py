@@ -4,7 +4,7 @@ import altair as alt
 import numpy as np
 
 with st.echo(code_location='below'):
-    election = open(r'D:\Miron\voting_data_eng.csv')
+    election = open('voting_data_eng.csv')
     election_csv = pd.read_csv(election)
     el2 = election_csv.assign(Turnout=lambda x: x.Number_of_valid_ballot_papers / x.Number_of_voters_enlisted * 100)
     el3 = el2.assign(Percentage_for_Putin=
