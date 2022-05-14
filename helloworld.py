@@ -30,10 +30,6 @@ with st.echo(code_location='below'):
         regresult = el3
     else:
         regresult = el3[el3['region_name'] == region]
-    def gaussian(x, a, b, c):
-        return a*np.exp(-np.power(x - b, 2)/(2*np.power(c, 2)))
-    def power_law(x, a, b):
-        return a*np.power(x, b)
     if plottype == 'Распределение явки':
         bandwidth = st.slider(label='Выберите ширину столбца для вычисления плотности', min_value=0.1, max_value=5.0)
         d = alt.Chart(regresult).transform_density('Turnout', as_=['Turnout', 'density'],
