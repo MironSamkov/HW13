@@ -25,9 +25,8 @@ with st.echo(code_location='below'):
              'существования значительных фальсификаций на этих выборах не сложилось, подробности и разные мнения можно '
              'почитать, например, [здесь](https://meduza.io/feature/2018/07/03/tak-skolko-golosov-ukrali-na-prezidentskih-vyborah-sotni-tysyach-ili-milliony).')
     region = st.selectbox('Выберите регион', regions)
-    regresult1 = el3[el3['region_name'] == 'All regions']
-    st.write(regresult1)
-    fig1 = ff.create_distplot([regresult1[a] for a in ['Turnout', 'Percentage_for_Putin']],
+    st.write(el3)
+    fig1 = ff.create_distplot([el3[a] for a in ['Turnout', 'Percentage_for_Putin']],
                           ['Явка', 'Процент голосов за Путина'], colors=['#63F5EF', '#A6ACEC'], bin_size=.05)
     fig1.update_layout(title={
         'text': "Явка и процент голосов за Путина",
