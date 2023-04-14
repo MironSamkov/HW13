@@ -2,3 +2,4 @@ altair
 pandas
 numpy
 streamlit
+plotly
