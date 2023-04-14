@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 import numpy as np
+import plotly.figure_factory as ff
 
 with st.echo(code_location='below'):
     election = open('voting_data_eng.csv')
@@ -22,6 +23,16 @@ with st.echo(code_location='below'):
              'существования значительных фальсификаций на этих выборах не сложилось, подробности и разные мнения можно '
              'почитать, например, [здесь](https://meduza.io/feature/2018/07/03/tak-skolko-golosov-ukrali-na-prezidentskih-vyborah-sotni-tysyach-ili-milliony).')
     region = st.selectbox('Выберите регион', regions)
+    fig1 = ff.create_distplot([el3[a] for a in ['Turnout', 'Percentage_for_Putin']],
+                          ['Явка', 'Процент голосов за Путина'], colors=['#63F5EF', '#A6ACEC'], bin_size=.05)
+    fig1.update_layout(title={
+        'text': "Явка и процент голосов за Путина",
+        'y': 0.9,
+        'x': 0.4,
+        'xanchor': 'center',
+        'yanchor': 'top'})
+
+    st.write(fig1)
     plottype = st.radio('Выберите тип диаграммы', ['Распределение явки', 'Распределение голосов за В.В.Путина',
                                           'Scatter-plot со значениями явки и процента голосов за В.В.Путина',
                                                    'Таблица с результатами'])
