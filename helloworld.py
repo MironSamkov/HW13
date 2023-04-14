@@ -27,17 +27,7 @@ with st.echo(code_location='below'):
     region = st.selectbox('Выберите регион', regions)
     el3 = el3.dropna()
     st.write(el3)
-    fig1 = ff.create_distplot([el3[a] for a in ['Turnout', 'Percentage_for_Putin']],
-                          ['Явка', 'Процент голосов за Путина'], colors=['#63F5EF', '#A6ACEC'], bin_size=.05)
-    fig1.update_layout(title={
-        'text': "Явка и процент голосов за Путина",
-        'y': 0.9,
-        'x': 0.4,
-        'xanchor': 'center',
-        'yanchor': 'top'})
-
-    st.write(fig1)
-    plottype = st.radio('Выберите тип диаграммы', ['Распределение явки', 'Распределение голосов за В.В.Путина',
+    plottype = st.radio('Выберите тип диаграммы', ['Распределение явки', 'Распределение явки с аппроксимированным распределением', 'Распределение голосов за В.В.Путина', 'Распределение голосов за В.В.Путина с аппроксимированным распределением',
                                           'Scatter-plot со значениями явки и процента голосов за В.В.Путина',
                                                    'Таблица с результатами'])
     color = st.color_picker(label='Выберите цвет', value='#8B0000')
@@ -52,6 +42,18 @@ with st.echo(code_location='below'):
             x=alt.X("Turnout:Q", axis=alt.Axis(title='Процент явки')),
             y=alt.Y('density:Q', axis=alt.Axis(title='Плотность распределения')))
         st.altair_chart(d, use_container_width=True)
+    if plottype == 'Распределение явки с аппроксимированным распределением':
+        bandwidth = st.slider(label='Выберите ширину столбца для вычисления плотности', min_value=0.1, max_value=5.0)
+        fig1 = ff.create_distplot([regresult['Turnout']],
+                          ['Turnout'], colors=['#63F5EF'], bin_size=bandwidth)
+        fig1.update_layout(title={
+            'text': "Явка",
+            'y': 0.9,
+            'x': 0.4,
+            'xanchor': 'center',
+            'yanchor': 'top'})
+
+        st.write(fig1)        
     if plottype == 'Распределение голосов за В.В.Путина':
         bandwidth = st.slider(label='Выберите ширину столбца для вычисления плотности', min_value=0.1, max_value=5.0)
         d = alt.Chart(regresult).transform_density('Percentage_for_Putin', as_=['Percentage_for_Putin', 'density'],
@@ -59,6 +61,19 @@ with st.echo(code_location='below'):
             x=alt.X("Percentage_for_Putin:Q", axis=alt.Axis(title='Процент голосов за Путина')),
             y=alt.Y('density:Q', axis=alt.Axis(title='Плотность распределения')))
         st.altair_chart(d, use_container_width=True)
+    if plottype == 'Распределение голосов за В.В.Путина с аппроксимированным распределением':
+        bandwidth = st.slider(label='Выберите ширину столбца для вычисления плотности', min_value=0.1, max_value=5.0)        
+        
+        fig1 = ff.create_distplot([el3['Percentage_for_Putin']],
+                          ['Percentage of votes'], colors=['#A6ACEC'], bin_size=bandwidth)
+        fig1.update_layout(title={
+            'text': "Процент голосов за Путина",
+            'y': 0.9,
+            'x': 0.4,
+            'xanchor': 'center',
+            'yanchor': 'top'})
+
+        st.write(fig1)
     if plottype == 'Scatter-plot со значениями явки и процента голосов за В.В.Путина':
         c = alt.Chart(regresult).mark_circle(size=1, color=color).encode(
             x=alt.X('Turnout', axis=alt.Axis(title='Явка (%)')), y=alt.Y('Percentage_for_Putin',
