@@ -3,6 +3,7 @@ import pandas as pd
 import altair as alt
 import numpy as np
 import plotly.figure_factory as ff
+import scipy
 
 
 with st.echo(code_location='below'):
