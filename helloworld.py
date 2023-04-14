@@ -4,6 +4,7 @@ import altair as alt
 import numpy as np
 import plotly.figure_factory as ff
 
+
 with st.echo(code_location='below'):
     election = open('voting_data_eng.csv')
     election_csv = pd.read_csv(election)
