@@ -64,8 +64,8 @@ with st.echo(code_location='below'):
     if plottype == 'Распределение голосов за В.В.Путина с аппроксимированным распределением':
         bandwidth = st.slider(label='Выберите ширину столбца для вычисления плотности', min_value=0.1, max_value=5.0)        
         
-        fig1 = ff.create_distplot([el3['Percentage_for_Putin']],
-                          ['Percentage of votes'], colors=['#A6ACEC'], bin_size=bandwidth)
+        fig1 = ff.create_distplot(regresult['Percentage_for_Putin'],
+                          'Percentage of votes', colors='#A6ACEC', bin_size=bandwidth)
         fig1.update_layout(title={
             'text': "Процент голосов за Путина",
             'y': 0.9,
