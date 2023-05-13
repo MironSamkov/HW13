@@ -36,7 +36,7 @@ with st.echo(code_location='below'):
         circle_size = 1
     else:
         regresult = el3[el3['region_name'] == region]
-        circle_size = 4
+        circle_size = 6
     if plottype == 'Распределение явки':
         bandwidth = st.slider(label='Выберите ширину столбца для вычисления плотности', min_value=0.1, max_value=5.0)
         d = alt.Chart(regresult).transform_density('Turnout', as_=['Turnout', 'density'],
