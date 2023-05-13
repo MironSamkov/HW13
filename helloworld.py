@@ -33,8 +33,10 @@ with st.echo(code_location='below'):
     color = st.color_picker(label='Выберите цвет', value='#8B0000')
     if region == 'All regions':
         regresult = el3
+        circle_size = 1
     else:
         regresult = el3[el3['region_name'] == region]
+        circle_size = 4
     if plottype == 'Распределение явки':
         bandwidth = st.slider(label='Выберите ширину столбца для вычисления плотности', min_value=0.1, max_value=5.0)
         d = alt.Chart(regresult).transform_density('Turnout', as_=['Turnout', 'density'],
@@ -75,7 +77,7 @@ with st.echo(code_location='below'):
 
         st.write(fig1)
     if plottype == 'Scatter-plot со значениями явки и процента голосов за В.В.Путина':
-        c = alt.Chart(regresult).mark_circle(size=1, color=color).encode(
+        c = alt.Chart(regresult).mark_circle(size=circle_size, color=color).encode(
             x=alt.X('Turnout', axis=alt.Axis(title='Явка (%)')), y=alt.Y('Percentage_for_Putin',
                                                                          axis=alt.Axis(
                                                                              title='Путин (%)'))).configure_mark(
