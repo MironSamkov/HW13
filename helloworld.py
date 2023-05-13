@@ -26,7 +26,6 @@ with st.echo(code_location='below'):
              'почитать, например, [здесь](https://meduza.io/feature/2018/07/03/tak-skolko-golosov-ukrali-na-prezidentskih-vyborah-sotni-tysyach-ili-milliony).')
     region = st.selectbox('Выберите регион', regions)
     el3 = el3.dropna()
-    st.write(el3)
     plottype = st.radio('Выберите тип диаграммы', ['Распределение явки', 'Распределение явки с аппроксимированным распределением', 'Распределение голосов за В.В.Путина', 'Распределение голосов за В.В.Путина с аппроксимированным распределением',
                                           'Scatter-plot со значениями явки и процента голосов за В.В.Путина',
                                                    'Таблица с результатами'])
